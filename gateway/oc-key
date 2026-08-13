@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+# oc-key: push a SCADS key into the running oc-gateway, or query it.
+#
+# The key is only ever carried on stdin between processes. It never appears in
+# argv (which ps would expose), never in an environment variable, and never in
+# a file. This script is installed root-owned so that an agent running as the
+# human user cannot rewrite it to capture the key on the next run.
+set -euo pipefail
+
+SOCKET="${OC_GATEWAY_SOCKET:-/run/oc-gateway/admin.sock}"
+ITEM="${OC_KEY_ITEM:-SCADS.AI}"
+FROM=""
+
+usage() {
+  cat >&2 <<'EOF'
+usage: oc-key unlock [--from bw|prompt] [--item NAME] [--socket PATH]
+       oc-key status [--socket PATH]
+       oc-key lock   [--socket PATH]
+
+  --from bw      read the key from Bitwarden, prompting for the master password
+  --from prompt  read the key from the terminal (no vault required)
+
+Defaults to bw when the bw CLI is installed, otherwise prompt.
+EOF
+  exit 2
+}
+
+[ $# -ge 1 ] || usage
+CMD="$1"
+shift
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --from) FROM="${2:-}"; shift 2 ;;
+    --item) ITEM="${2:-}"; shift 2 ;;
+    --socket) SOCKET="${2:-}"; shift 2 ;;
+    -h|--help) usage ;;
+    *) echo "oc-key: unknown argument '$1'" >&2; usage ;;
+  esac
+done
+
+# Send one JSON request from stdin, print the one-line JSON reply.
+send() {
+  node -e '
+    const net = require("net")
+    const sock = process.argv[1]
+    let payload = ""
+    process.stdin.on("data", (d) => { payload += d })
+    process.stdin.on("end", () => {
+      const c = net.createConnection(sock, () => c.write(payload.trim() + "\n"))
+      let buf = ""
+      c.on("data", (d) => {
+        buf += d
+        if (buf.includes("\n")) { c.end(); process.stdout.write(buf.trim()) }
+      })
+      c.on("error", (e) => {
+        process.stderr.write("oc-key: cannot reach " + sock + ": " + e.code + "\n")
+        process.exit(1)
+      })
+    })
+  ' "$SOCKET"
+}
+
+# Turn stdin into a JSON string literal, dropping one trailing newline.
+json_escape() {
+  node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>process.stdout.write(JSON.stringify(s.replace(/\n$/,""))))'
+}
+
+case "$CMD" in
+  unlock)
+    if [ -z "$FROM" ]; then
+      if command -v bw >/dev/null 2>&1; then FROM=bw; else FROM=prompt; fi
+    fi
+    case "$FROM" in
+      bw)
+        command -v bw >/dev/null 2>&1 || {
+          echo "oc-key: bw is not installed; use --from prompt" >&2
+          exit 1
+        }
+        session="$(bw unlock --raw)" || {
+          echo "oc-key: bitwarden unlock failed" >&2
+          exit 1
+        }
+        key_json="$(BW_SESSION="$session" bw get password "$ITEM" | json_escape)" || {
+          echo "oc-key: could not read item '$ITEM' from the vault" >&2
+          exit 1
+        }
+        unset session
+        ;;
+      prompt)
+        if [ -t 0 ]; then
+          printf 'SCADS API key: ' >&2
+          stty -echo
+          IFS= read -r typed
+          stty echo
+          printf '\n' >&2
+          key_json="$(printf '%s' "$typed" | json_escape)"
+          unset typed
+        else
+          key_json="$(json_escape)"
+        fi
+        ;;
+      *) usage ;;
+    esac
+    [ "$key_json" != '""' ] || { echo "oc-key: refusing to send an empty key" >&2; exit 1; }
+    reply="$(printf '{"op":"set-key","key":%s}' "$key_json" | send)"
+    unset key_json
+    case "$reply" in
+      *'"ok":true'*) echo "oc-key: gateway unlocked" ;;
+      *) echo "oc-key: gateway rejected the key: $reply" >&2; exit 1 ;;
+    esac
+    ;;
+  status)
+    reply="$(printf '{"op":"status"}' | send)"
+    case "$reply" in
+      *'"locked":true'*) echo "oc-key: locked (run: oc-key unlock)" ;;
+      *'"locked":false'*) echo "oc-key: unlocked" ;;
+      *) echo "oc-key: unexpected reply: $reply" >&2; exit 1 ;;
+    esac
+    ;;
+  lock)
+    printf '{"op":"lock"}' | send >/dev/null
+    echo "oc-key: locked"
+    ;;
+  *) usage ;;
+esac
