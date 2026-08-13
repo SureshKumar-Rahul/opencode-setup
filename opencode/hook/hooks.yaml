@@ -1,0 +1,36 @@
+# opencode lifecycle hooks
+# See: https://github.com/KristjanPikhof/OpenCode-Hooks
+#
+# To enable a hook: change `hooks: []` below to `hooks:` and uncomment the
+# item(s) you want. `hooks` must be a YAML array; leaving it empty (all items
+# commented) is why it must be `[]` here, otherwise the plugin errors at launch.
+
+hooks: []
+  # Run tests after any file change (project-specific)
+  # - id: test-on-change
+  #   event: file.changed
+  #   scope: main
+  #   conditions: [matchesCodeFiles]
+  #   async: true
+  #   actions:
+  #     - bash: "npm test 2>/dev/null || cargo test 2>/dev/null || go test ./... 2>/dev/null || true"
+
+  # Auto-format code on file changes
+  # - id: format-on-save
+  #   event: file.changed
+  #   conditions:
+  #     - matchesAnyPath: "**/*.{ts,js,tsx,jsx,json,md,yaml}"
+  #   async: true
+  #   actions:
+  #     - bash:
+  #         command: "npx prettier --write --ignore-unknown $CHANGED_FILES 2>/dev/null || true"
+  #         timeout: 15000
+
+  # Check for uncommitted changes when session goes idle
+  # - id: check-dirty-on-idle
+  #   event: session.idle
+  #   async: true
+  #   actions:
+  #     - bash:
+  #         command: "cd $OPENCODE_PROJECT_DIR && git status --short | head -5"
+  #         timeout: 5000

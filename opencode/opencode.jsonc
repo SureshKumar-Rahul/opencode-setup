@@ -1,0 +1,192 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": [
+    "opencode-damage-control",
+    "opencode-smart-title",
+    "opencode-background-agents",
+    "@tarquinen/opencode-dcp@latest",
+    "opencode-pty",
+    "opencode-yaml-hooks",
+    "opencode-vision"
+  ],
+  "snapshot": true,
+  "mcp": {
+    "playwright": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@playwright/mcp"
+      ],
+      "enabled": true
+    }
+  },
+  "compaction": {
+    "auto": true,
+    "tail_turns": 20
+  },
+  "tool_output": {
+    "max_lines": 500,
+    "max_bytes": 16384
+  },
+  "permission": {
+    "bash": {
+      "git push --force*": "deny",
+      "git push -f*": "deny",
+      "git reset --hard*": "deny",
+      "git reset --merge*": "deny",
+      "git clean -f*": "deny",
+      "git clean -fd*": "deny",
+      "git branch -D*": "deny",
+      "git checkout .": "deny",
+      "git checkout -- *": "deny",
+      "git restore .": "deny",
+      "git restore -- *": "deny",
+      "git stash drop*": "deny",
+      "git stash clear*": "deny",
+      "git filter-branch*": "deny",
+      "rm -rf *": "ask",
+      "rm -r *": "ask",
+      "rm -f *": "ask",
+      "rm *": "ask",
+      "mv *": "ask",
+      "cp *": "ask",
+      "chmod 777 *": "deny",
+      "curl * | sh*": "deny",
+      "curl * | bash*": "deny",
+      "wget * | sh*": "deny",
+      "wget * | bash*": "deny",
+      "> /dev/sd*": "deny",
+      "dd if=*": "deny",
+      "DROP TABLE*": "deny",
+      "DROP DATABASE*": "deny",
+      "TRUNCATE*": "deny",
+      "terraform destroy*": "ask",
+      "kubectl delete*": "ask",
+      "docker system prune*": "ask",
+      "docker rm *": "ask",
+      "docker rmi *": "ask",
+      "systemctl stop*": "ask",
+      "systemctl disable*": "ask",
+      "crontab -r*": "deny",
+      "*": "allow"
+    },
+    "read": {
+      ".env*": "ask",
+      "*.pem": "ask",
+      "*.key": "ask",
+      "id_rsa*": "deny",
+      "id_ed25519*": "deny",
+      "*": "allow"
+    },
+    "external_directory": {
+      "~/.ssh/**": "deny",
+      "~/.gnupg/**": "deny",
+      "~/.aws/**": "deny",
+      "~/.config/opencode/**": "ask",
+      "*": "ask"
+    }
+  },
+  "provider": {
+    "scads": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "SCADS.AI",
+      "options": {
+        "baseURL": "http://127.0.0.1:4141/v1",
+        "apiKey": "local"
+      },
+      "models": {
+        "MiniMaxAI/MiniMax-M3-MXFP8": {
+          "name": "MiniMaxAI/MiniMax-M3-MXFP8",
+          "limit": {
+            "context": 524288
+          }
+        },
+        "Qwen/Qwen3-Coder-30B-A3B-Instruct": {
+          "name": "Qwen/Qwen3-Coder-30B-A3B-Instruct",
+          "limit": {
+            "context": 131072
+          }
+        },
+        "alias-code": {
+          "name": "alias-code",
+          "limit": {
+            "context": 128000
+          }
+        },
+        "alias-ha": {
+          "name": "alias-ha",
+          "limit": {
+            "context": 40000
+          }
+        },
+        "alias-huge": {
+          "name": "alias-huge",
+          "limit": {
+            "context": 524288
+          }
+        },
+        "alias-huge-no-thinking": {
+          "name": "alias-huge-no-thinking",
+          "limit": {
+            "context": 524288
+          }
+        },
+        "alias-reasoning": {
+          "name": "alias-reasoning",
+          "limit": {
+            "context": 131072
+          }
+        },
+        "alias-vision": {
+          "name": "alias-vision",
+          "limit": {
+            "context": 262144
+          }
+        },
+        "google/gemma-4-26B-A4B-it": {
+          "name": "google/gemma-4-26B-A4B-it",
+          "limit": {
+            "context": 262144
+          }
+        },
+        "google/gemma-4-31B-it": {
+          "name": "google/gemma-4-31B-it",
+          "limit": {
+            "context": 262144
+          }
+        },
+        "meta-llama/Llama-3.3-70B-Instruct": {
+          "name": "meta-llama/Llama-3.3-70B-Instruct",
+          "limit": {
+            "context": 65536
+          }
+        },
+        "moonshotai/Kimi-K2.7-Code": {
+          "name": "moonshotai/Kimi-K2.7-Code",
+          "limit": {
+            "context": 262144
+          }
+        },
+        "moonshotai/Kimi-K3": {
+          "name": "moonshotai/Kimi-K3",
+          "limit": {
+            "context": 1048576
+          }
+        },
+        "openai/gpt-oss-120b": {
+          "name": "openai/gpt-oss-120b",
+          "limit": {
+            "context": 131072
+          }
+        },
+        "zai-org/GLM-5.2-FP8": {
+          "name": "zai-org/GLM-5.2-FP8",
+          "limit": {
+            "context": 524288
+          }
+        }
+      }
+    }
+  }
+}
