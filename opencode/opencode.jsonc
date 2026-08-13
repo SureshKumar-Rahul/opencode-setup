@@ -99,91 +99,106 @@
         "MiniMaxAI/MiniMax-M3-MXFP8": {
           "name": "MiniMaxAI/MiniMax-M3-MXFP8",
           "limit": {
-            "context": 524288
+            "context": 524288,
+            "output": 32768
           }
         },
         "Qwen/Qwen3-Coder-30B-A3B-Instruct": {
           "name": "Qwen/Qwen3-Coder-30B-A3B-Instruct",
           "limit": {
-            "context": 131072
+            "context": 131072,
+            "output": 32768
           }
         },
         "alias-code": {
           "name": "alias-code",
           "limit": {
-            "context": 128000
+            "context": 128000,
+            "output": 32000
           }
         },
         "alias-ha": {
           "name": "alias-ha",
           "limit": {
-            "context": 40000
+            "context": 40000,
+            "output": 10000
           }
         },
         "alias-huge": {
           "name": "alias-huge",
           "limit": {
-            "context": 524288
+            "context": 524288,
+            "output": 32768
           }
         },
         "alias-huge-no-thinking": {
           "name": "alias-huge-no-thinking",
           "limit": {
-            "context": 524288
+            "context": 524288,
+            "output": 32768
           }
         },
         "alias-reasoning": {
           "name": "alias-reasoning",
           "limit": {
-            "context": 131072
+            "context": 131072,
+            "output": 32768
           }
         },
         "alias-vision": {
           "name": "alias-vision",
           "limit": {
-            "context": 262144
+            "context": 262144,
+            "output": 32768
           }
         },
         "google/gemma-4-26B-A4B-it": {
           "name": "google/gemma-4-26B-A4B-it",
           "limit": {
-            "context": 262144
+            "context": 262144,
+            "output": 32768
           }
         },
         "google/gemma-4-31B-it": {
           "name": "google/gemma-4-31B-it",
           "limit": {
-            "context": 262144
+            "context": 262144,
+            "output": 32768
           }
         },
         "meta-llama/Llama-3.3-70B-Instruct": {
           "name": "meta-llama/Llama-3.3-70B-Instruct",
           "limit": {
-            "context": 65536
+            "context": 65536,
+            "output": 16384
           }
         },
         "moonshotai/Kimi-K2.7-Code": {
           "name": "moonshotai/Kimi-K2.7-Code",
           "limit": {
-            "context": 262144
+            "context": 262144,
+            "output": 32768
           }
         },
         "moonshotai/Kimi-K3": {
           "name": "moonshotai/Kimi-K3",
           "limit": {
-            "context": 1048576
+            "context": 1048576,
+            "output": 32768
           }
         },
         "openai/gpt-oss-120b": {
           "name": "openai/gpt-oss-120b",
           "limit": {
-            "context": 131072
+            "context": 131072,
+            "output": 32768
           }
         },
         "zai-org/GLM-5.2-FP8": {
           "name": "zai-org/GLM-5.2-FP8",
           "limit": {
-            "context": 524288
+            "context": 524288,
+            "output": 32768
           }
         }
       }
