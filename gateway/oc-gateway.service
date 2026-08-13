@@ -1,0 +1,34 @@
+[Unit]
+Description=opencode SCADS credential gateway
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ocgw
+Group=ocgw-admin
+ExecStart=/usr/bin/node /usr/local/lib/oc-gateway/oc-gateway.mjs
+Environment=OC_GATEWAY_PORT=4141
+Environment=OC_GATEWAY_HOST=127.0.0.1
+Environment=OC_GATEWAY_SOCKET=/run/oc-gateway/admin.sock
+Environment=OC_GATEWAY_TTL_SECONDS=28800
+RuntimeDirectory=oc-gateway
+RuntimeDirectoryMode=0750
+NoNewPrivileges=yes
+ProtectHome=yes
+ProtectSystem=strict
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+CapabilityBoundingSet=
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=yes
+LockPersonality=yes
+SystemCallArchitectures=native
+LimitCORE=0
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
