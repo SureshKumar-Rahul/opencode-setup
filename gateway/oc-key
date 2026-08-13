@@ -81,6 +81,11 @@ case "$CMD" in
           echo "oc-key: bitwarden unlock failed" >&2
           exit 1
         }
+        # The local vault cache can be days old. Without this, a key rotated
+        # elsewhere yields the stale key here and the gateway gets a 401 or 500
+        # from upstream with no obvious cause.
+        BW_SESSION="$session" bw sync >/dev/null 2>&1 ||
+          echo "oc-key: warning, vault sync failed; the key may be stale" >&2
         key_json="$(BW_SESSION="$session" bw get password "$ITEM" | json_escape)" || {
           echo "oc-key: could not read item '$ITEM' from the vault" >&2
           exit 1
